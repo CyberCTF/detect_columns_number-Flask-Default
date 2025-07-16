@@ -1,0 +1,71 @@
+{
+  "mission_context": {
+    "fictional_company_environment": "Acme Research Portal is an internal web application used by researchers to share scientific project updates. It features a search page with dynamic SQL queries to retrieve project details by ID.",
+    "technical_setup_and_constraints": "The application uses a PHP backend with a MySQL database. User input from the 'project_id' GET parameter is directly embedded into SQL queries without proper sanitization. Error display is enabled. The security team restricted available tools; sqlmap use is not allowed for this lab.",
+    "discovery_context": "During a routine pentest, a researcher reported odd error messages when manipulating the 'project_id' parameter in the URL. Testing revealed a classic SQL injection vulnerability. Union-based injection was required to enumerate the number of columns, as further exploitation depended on aligning injected UNION SELECTs with the underlying query."
+  },
+  "element_to_proof": "The number of columns in the 'projects' table (hint: it is 4).",
+  "walkthrough": {
+    "title": "Acme Research Portal: Column Enumeration via UNION Injection",
+    "steps": [
+      {
+        "question": "How can you verify if the 'project_id' parameter is injectable?",
+        "hint": "Try adding a single quote or logical expression to the URL and observe the response.",
+        "solution": "Visit `/search.php?project_id=1'` or `/search.php?project_id=1 OR 1=1--` and look for SQL-related error messages or unusual results."
+      },
+      {
+        "question": "What is the first technique to determine the number of columns needed for a UNION SELECT?",
+        "hint": "Try the ORDER BY method—incrementally increase the ORDER BY number.",
+        "solution": "Send `/search.php?project_id=1 ORDER BY 1--`, `/search.php?project_id=1 ORDER BY 2--`, etc., until the application returns an error. The largest number without an error is the correct number of columns."
+      },
+      {
+        "question": "Which alternative technique helps confirm the result, and how does it work?",
+        "hint": "Use NULL placeholders in a UNION SELECT.",
+        "solution": "Try `/search.php?project_id=1' UNION SELECT NULL--` and increment the number of NULLs: `/search.php?project_id=1' UNION SELECT NULL,NULL--`, `/search.php?project_id=1' UNION SELECT NULL,NULL,NULL--`, etc., until you receive no error. The count of NULLs is the number of columns."
+      },
+      {
+        "question": "Once found, how do you prove the correct number of columns to complete the challenge?",
+        "hint": "Submit the number via the CTF platform or include it in a custom UNION SELECT.",
+        "solution": "Confirm the number (4). For bonus, demonstrate a UNION SELECT with dummy values: `/search.php?project_id=1' UNION SELECT 1,2,3,4--`."
+      }
+    ],
+    "final_flag_info": "Number of columns in SELECT (4)"
+  },
+  "lab_readme": {
+    "title": "Detecting the Number of Columns in MySQL using UNION Injection",
+    "description": "Hands-on CTF lab for discovering the exact number of columns in a vulnerable MySQL query using both ORDER BY and NULL-based UNION injection techniques.",
+    "objectives": [
+      "Identify SQL injection via a GET parameter",
+      "Use ORDER BY to find the number of columns",
+      "Use NULL placeholders in UNION SELECT to determine column count",
+      "Understand why column count is critical for UNION-based attacks"
+    ],
+    "difficulty": "Beginner",
+    "estimated_time": "20-40 minutes",
+    "prerequisites": [
+      "Basic SQL syntax",
+      "Understanding of HTTP requests",
+      "Familiarity with SQL injection fundamentals",
+      "Ability to use a web browser and a proxy tool like Burp Suite or OWASP ZAP"
+    ],
+    "skills_learned": [
+      "SQL injection enumeration",
+      "MySQL error-based testing",
+      "Payload crafting for UNION SELECT",
+      "Security analysis of web parameters"
+    ],
+    "project_structure": [
+      "folder:build",
+      "folder:deploy",
+      "folder:test",
+      "folder:docs",
+      "file:readme.md",
+      "file:.gitignore"
+    ],
+    "quick_start": {
+      "prerequisites": "Docker or a local PHP/MySQL stack (e.g., XAMPP/LAMP/MAMP)",
+      "installation": "Clone the repo. Launch the vulnerable app with `docker-compose up`. Access the app at `http://localhost:8080/search.php`."
+    },
+    "issue_tracker_url": "https://github.com/your-organization/ctf-labs/issues"
+  }
+}

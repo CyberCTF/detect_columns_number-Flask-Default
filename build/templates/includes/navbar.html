@@ -9,16 +9,10 @@
             </div>
             <!-- Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
-                {% for item in metadata.navigation.main %}
-                <a href="{{ item.link }}" class="text-gray-300 hover:text-white transition-colors">{{ item.title }}</a>
-                {% endfor %}
+                <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="/lab" class="text-gray-300 hover:text-white transition-colors">Project Search</a>
             </div>
-            <!-- Auth Links -->
-            <div class="flex items-center space-x-4">
-                {% for item in metadata.navigation.auth %}
-                <a href="{{ item.link }}" class="text-gray-300 hover:text-white transition-colors">{{ item.title }}</a>
-                {% endfor %}
-            </div>
+            <!-- Auth Links (none for this app) -->
         </div>
     </div>
 </nav> 
